@@ -1,0 +1,24 @@
+{
+    "name": "translator",
+    "version": "1.0.0",
+    "author": "Andy",
+    "type": "module",
+    "license": "MIT",
+    "scripts": {
+        "start": "node ./index.js"
+    },
+    "dependencies": {
+        "epub": "^1.2.1",
+        "epub-gen": "^0.1.0",
+        "fetch": "^1.1.0",
+        "html-to-text": "^9.0.5",
+        "node-fetch": "2",
+        "ora": "^7.0.1",
+        "translate": "^2.0.2"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0 || ^8.2.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-plugin-import": "^2.25.2"
+    }
+}
