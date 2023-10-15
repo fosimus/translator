@@ -2,39 +2,50 @@
 import { htmlToText } from "html-to-text";
 import translate from "translate";
 import EpubGen from "epub-gen";
+import pLimit from "p-limit";
+import fetch from "node-fetch";
 import config from "./config.js";
 
+globalThis.fetch = fetch;
+
+const P_LIMIT = 100;
+
 const enhancedTranslation = async (info) => {
-  for (let i = 1; i < 50; i += 1) {
+  for (let i = 1; i < 2; i += 1) {
     try {
       /* eslint-disable no-await-in-loop */
       const data = await translate(info, { from: config.from, to: config.to });
       return data;
     } catch (e) {
-      // nothing
+      /* eslint-disable-next-line no-console */
+      console.log(e);
     }
   }
   return Promise.reject();
 };
 
 const getTranslations = async (data) => {
-  const paragraphPromises = data.split(/\n\n/).map(async (paragraph = "") => {
+  const paragraphPromisesLimit = pLimit(P_LIMIT);
+  /* eslint-disable-next-line consistent-return */
+  const paragraphPromises = data.split(/\n\n/).map((paragraph = "", i) => paragraphPromisesLimit(async () => {
+    /* eslint-disable-next-line no-useless-escape */
     const sentences = paragraph.replace(/\n/g, " ").match(/([^ \r\n][^!?\.\r\n]+[\w”!?\.]+)/g);
     if (sentences && sentences.length > 0) {
-      const sentencePromises = sentences.map(async (sentence) => {
+      const sentencePromisesLimit = pLimit(P_LIMIT);
+      const sentencePromises = sentences.map((sentence, y) => sentencePromisesLimit(async () => {
         let translatedSentence = "";
         try {
-          const translation = await enhancedTranslation(sentence);
+          const translation = await enhancedTranslation(sentence, i, y);
           translatedSentence = `<span style="color: green">${translation}</span> `;
         } catch (e) {
           translatedSentence = " ";
         }
         return `${sentence} ${translatedSentence}`;
-      });
+      }));
       const translatedSentences = await Promise.all(sentencePromises);
       return `<p>${translatedSentences.join("")}</p>`;
     }
-  });
+  }));
 
   const result = await Promise.all(paragraphPromises);
   return result.join("");
@@ -62,12 +73,14 @@ export const getPlainBookInTextFormat = async (book) => {
 };
 
 export const translatePlainBook = async (plainBook) => {
-  const newBookPromises = plainBook.map(async (chapter) => {
+  const newBook = [];
+  /* eslint-disable-next-line no-restricted-syntax */
+  for (const chapter of plainBook) {
     const translations = await getTranslations(chapter.textWithoutHtml);
-    return translations;
-  });
-
-  const newBook = await Promise.all(newBookPromises);
+    newBook.push(translations);
+    /* eslint-disable-next-line no-console */
+    console.log(`Chapter ${newBook.length} done (from ${plainBook.length})`);
+  }
   return newBook;
 };
 

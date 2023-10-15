@@ -4,7 +4,8 @@ This tool will assist you in learning a language through the parallel reading me
 
 ## Restrictions
 
-Currently only `.epub` book format is supported.
+- Currently only `.epub` book format is supported.
+- There is a limit on the number of translations depending on the engine (check sites: Google, Yandex, Libre and DeepL).
 
 ## Getting started
 

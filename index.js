@@ -1,11 +1,8 @@
 import EPub from "epub";
-import fetch from "node-fetch";
 import ora from "ora";
 import config from "./config.js";
 
 import { getPlainBookInTextFormat, translatePlainBook, createEpubBook } from "./helper.js";
-
-globalThis.fetch = fetch;
 
 const book = new EPub(config.input);
 
