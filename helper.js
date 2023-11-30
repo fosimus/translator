@@ -11,7 +11,7 @@ globalThis.fetch = fetch;
 const P_LIMIT = 100;
 
 const enhancedTranslation = async (info) => {
-  for (let i = 1; i < 2; i += 1) {
+  for (let i = 1; i < 50; i += 1) {
     try {
       /* eslint-disable no-await-in-loop */
       const data = await translate(info, { from: config.from, to: config.to });
